@@ -32,11 +32,13 @@ func Generate(c *cli.Context) error {
 		daoPackage := daoDir[index+1:]
 		GenBaseDao(appId, daoPackage, tableNames, tablePrefix)
 	} else {
-		orgTableName := tableName
-		columns := db.GetDataBySql("desc " + tableName)
-		tableName := getTableName(tableName, tablePrefix)
-		GenerateModel(tableName, columns, c.String("dir"))
-		GenerateDao(orgTableName, appId, tableName, daoDir)
+		for _, table := range strings.Split(tableName, ",") {
+			orgTableName := table
+			columns := db.GetDataBySql("desc " + tableName)
+			tableName := getTableName(tableName, tablePrefix)
+			GenerateModel(tableName, columns, c.String("dir"))
+			GenerateDao(orgTableName, appId, tableName, daoDir)
+		}
 	}
 	return nil
 }

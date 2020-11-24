@@ -1,95 +1,88 @@
-model-generator
+gorm-generator
 ===
 
-this is a model generator for [jinzhu/gorm](https://gorm.io/gorm)
+这是 [gorm.io/gorm](https://gorm.io/gorm) 的代码生成器，从项目 https://github.com/BigKuCha/model-generator 中变更而来
+主要配合 go-micro v2生成对应的代码
 
-Demo
+依赖
 ===
-![image](https://github.com/bigkucha/model-generator/blob/master/media/test.gif)
+- [jennifer](https://github.com/dave/jennifer) --go的代码生成器
 
-Dependency
-===
-- [jennifer](https://github.com/dave/jennifer)
-
-Install
+安装
 ===
 
 ```
-## $ go get github.com/bigkucha/model-generator ## 使用本源的不能使用此方法安装
+# 使用远程源安装
+go get https://github.com/ycoe/gorm-generator
 
-git clone git@github.com:ycoe/model-generator.git
+# 使用本地源安装
+git clone git@github.com:ycoe/gorm-generator.git
 cd model-generator
 go get .
+
+# 成功的话，进入 $GOPATH/bin/ 可以看到有文件生成：gorm-generator
 ```
 
-Usage
+使用
 ===
 
 ```
-$ $GOPATH/bin/model-generator -u=root -p=(pwd of your mysql) -d=database -t=table -dir=./model -dd=./dao -appid=myapp
+# 首先确保你的GOPATH有配置
+$GOPATH/bin/gorm-generator -u=root -p=(pwd of your mysql) -d=database -t=table -dir=./model -dd=./dao -appid=myapp -tp=finance_
 ```
 
-Flags
+参数
 ===
 <table>
  <tr>
     <th>Flag</th>
     <th>Rule</th>
-    <th>Usage</th>
+    <th>使用</th>
   </tr>
   <tr>
     <td>username, u</td>
-    <td>optional, default 'root'</td>
-    <td>username of mysql</td>
+    <td>非必填，默认：root</td>
+    <td>数据库账号</td>
   </tr>
   
   <tr>
     <td>password, p</td>
-    <td>require, default null</td>
-    <td>password of mysql</td>
+    <td>必填，默认为null</td>
+    <td>数据库密码</td>
   </tr>
   
   <tr>
     <td>database, d</td>
-    <td>require</td>
-    <td>select your database</td>
+    <td>必填</td>
+    <td>库名s</td>
   </tr>
   <tr>
     <td>table, t</td>
-    <td>optional,default 'ALL'</td>
-    <td>chose table to generate model, if not set ,all tables in your database will be used</td>
+    <td>非必填，默认值：ALL，表示所有表</td>
+    <td>需要创建的表名，多个使用半角逗号分隔。ALL时，会生成dao.go</td>
   </tr>
   
   <tr>
     <td>dir</td>
-    <td>optional,default 'model' of current directory</td>
-    <td>model files where to be store</td>
+    <td>非必填，默认值：model</td>
+    <td>model文件的存储路径</td>
   </tr>
   
   <tr>
     <td>daodir, dd</td>
-    <td>required</td>
-    <td>dao files where to be store</td>
+    <td>必填</td>
+    <td>dao文件的存储目录</td>
   </tr>
   
   <tr>
     <td>appid</td>
-    <td>required</td>
-    <td>your appId</td>
+    <td>必填</td>
+    <td>appId，用于生成引用路径</td>
   </tr>
   
   <tr>
     <td>tablePrefix, tp</td>
-    <td></td>
-    <td>table prefix</td>
+    <td>可选</td>
+    <td>表前缀</td>
   </tr>
 </table>
-
-Note
-===
- run `$GOPATH/bin/model-generator -h` for more help
-
-TODO
-===
-- Multi tables
-- regex 

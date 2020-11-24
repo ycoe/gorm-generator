@@ -1,8 +1,8 @@
 package main
 
 import (
-	"github.com/bigkucha/model-generator/generator"
 	"github.com/urfave/cli"
+	"github.com/ycoe/gorm-generator/generator"
 	"os"
 )
 
