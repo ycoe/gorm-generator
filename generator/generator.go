@@ -22,7 +22,7 @@ func Generate(c *cli.Context) error {
 			orgTableName := table["Tables_in_"+c.String("d")]
 			tableName := getTableName(orgTableName, tablePrefix)
 			tableNames = append(tableNames, tableName)
-			columns := db.GetDataBySql("desc " + orgTableName)
+			columns := db.GetDataBySql("SHOW FULL COLUMNS FROM  " + orgTableName)
 			GenerateModel(tableName, columns, c.String("dir"))
 			GenerateDao(orgTableName, appId, tableName, daoDir)
 		}

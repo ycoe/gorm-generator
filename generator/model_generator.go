@@ -24,6 +24,7 @@ func GenerateModel(tableName string, columns []map[string]string, dir string) {
 			getCol(st, t)
 			st.Tag(map[string]string{"json": column})
 		}
+		st.Comment(col["Comment"])
 		codes = append(codes, st)
 	}
 	f := jen.NewFile(daoPackage)
