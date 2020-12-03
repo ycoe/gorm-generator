@@ -23,7 +23,7 @@ func (account *AccountDao) Create (entity *model.Account) (uint, error) {
 	return entity.ID, result.Error
 }
 */
-func GenerateDao(orgTableName string, appId, tableName, dir string) {
+func GenerateDao(orgTableName string, appId, tableName, dir, idType string) {
 	index := strings.LastIndex(dir, "/")
 	daoPackage := dir[index+1 : len(dir)]
 	f := jen.NewFile(daoPackage)
@@ -32,10 +32,10 @@ func GenerateDao(orgTableName string, appId, tableName, dir string) {
 	f.ImportAlias(appId+"/proto", appId)
 	f.ImportAlias("time", "time")
 
-	genDaoVar(f, orgTableName, tableName)
 	genGetEntityDao(f, orgTableName, tableName)
 	genEntityDaoStruct(f, tableName)
-	genCreateFun(f, appId, tableName)
+	genCreateFun(f, appId, tableName, idType)
+	genGetFun(f, appId, tableName, idType)
 
 	_ = os.MkdirAll(dir, os.ModePerm)
 	fileName := dir + "/" + inflection.Singular(tableName) + ".dao.go"
@@ -47,34 +47,19 @@ func GenerateDao(orgTableName string, appId, tableName, dir string) {
 }
 
 /**
-var accountDao *AccountDao = nil
-*/
-func genDaoVar(f *jen.File, orgTableName string, tableName string) {
-	tableDaoName := helper.SnakeCase2CamelCase(inflection.Singular(tableName), true) + "Dao"
-	tableDaoVarName := helper.SnakeCase2CamelCase(inflection.Singular(tableName), false) + "Dao"
-	f.Var().Id(tableDaoVarName).Id("*" + tableDaoName).Op("=").Nil()
-}
-
-/**
 func GetAccountDao() *AccountDao {
 	err := GetDao().Ping()
 	if err != nil {
 		logger.Error(err)
 	}
-	if accountDao != nil && err == nil {
-		return accountDao
-	}
 	table := GetDao().client.Table("finance_account")
-	accountDao = &AccountDao{
+	return &AccountDao{
 		db: table,
 	}
-
-	return accountDao
 }
 */
 func genGetEntityDao(f *jen.File, orgTableName string, tableName string) {
 	tableDaoName := helper.SnakeCase2CamelCase(inflection.Singular(tableName), true) + "Dao"
-	tableDaoVarName := helper.SnakeCase2CamelCase(inflection.Singular(tableName), false) + "Dao"
 	f.Func().Id("Get"+tableDaoName).Params().Id("*"+tableDaoName).Block(
 		jen.Id("err").Op(":=").Id("GetDao").Call().Dot("Ping").Call(),
 		jen.If(
@@ -84,22 +69,17 @@ func genGetEntityDao(f *jen.File, orgTableName string, tableName string) {
 				),
 			),
 		),
-		jen.If(
-			jen.Id(tableDaoVarName).Op("!=").Nil().Op("&&").Id("err").Op("==").Nil().Block(
-				jen.Return(
-					jen.Id(tableDaoVarName),
-				),
-			),
-		),
+
 		jen.Id("table").Op(":=").Id("GetDao").Call().Dot("client").Dot("Table").Call(
 			jen.Lit(orgTableName),
 		),
-		jen.Id(tableDaoVarName).Op("=").Id("&"+tableDaoName).Values(
-			jen.Dict{
-				jen.Id("db"): jen.Id("table"),
-			},
+		jen.Return(
+			jen.Id("&"+tableDaoName).Values(
+				jen.Dict{
+					jen.Id("db"): jen.Id("table"),
+				},
+			),
 		),
-		jen.Return(jen.Id(tableDaoVarName)),
 	)
 }
 
@@ -116,20 +96,48 @@ func genEntityDaoStruct(f *jen.File, tableName string) {
 }
 
 /**
+//通过ID获取
+func (d *UserFundDao) Get(id int32) (userFund model.UserFund, err error) {
+	err = d.db.First(&userFund, id).Error
+	return
+}
+*/
+func genGetFun(f *jen.File, appId, tableName, idType string) {
+	entityName := helper.SnakeCase2CamelCase(inflection.Singular(tableName), true)
+	entityVarName := helper.SnakeCase2CamelCase(inflection.Singular(tableName), false)
+	entityDaoName := entityName + "Dao"
+	f.Comment("通过ID获取").Line().Func().Params(
+		jen.Id("d").Id("*"+entityDaoName),
+	).Id("GetById").Params(
+		jen.Id("id").Id(idType),
+	).Params(
+		jen.Id(entityVarName).Id("model").Dot(entityName),
+		jen.Id("err").Id("error"),
+	).Block(
+		jen.Id("err").Op("=").Id("d").Dot("db").Dot("First").Call(
+			jen.Id("&").Id(entityVarName),
+			jen.Id("id"),
+		).Dot("Error"),
+		jen.Return(),
+	)
+}
+
+/**
 func (dao *AccountDao) Create(entity *model.Account) (uint, error) {
 	result := d.db.Create(entity)
 	return entity.ID, result.Error
 }
 */
-func genCreateFun(f *jen.File, appId, tableName string) {
+func genCreateFun(f *jen.File, appId, tableName, idType string) {
 	entityName := helper.SnakeCase2CamelCase(inflection.Singular(tableName), true)
 	entityDaoName := entityName + "Dao"
-	f.Func().Params(
+
+	f.Comment("创建").Line().Func().Params(
 		jen.Id("d").Id("*"+entityDaoName),
 	).Id("Create").Params(
 		jen.Id("entity").Id("*").Qual(appId+"/model", entityName),
 	).Params(
-		jen.Id("uint"),
+		jen.Id(idType),
 		jen.Id("error"),
 	).Block(
 		jen.Id("result").Op(":=").Id("d").Dot("db").Dot("Create").Call(
@@ -139,5 +147,5 @@ func genCreateFun(f *jen.File, appId, tableName string) {
 			jen.Id("entity").Dot("ID"),
 			jen.Id("result").Dot("Error"),
 		),
-	)
+	).Line()
 }

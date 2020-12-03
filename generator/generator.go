@@ -23,8 +23,8 @@ func Generate(c *cli.Context) error {
 			tableName := getTableName(orgTableName, tablePrefix)
 			tableNames = append(tableNames, tableName)
 			columns := db.GetDataBySql("SHOW FULL COLUMNS FROM  " + orgTableName)
-			GenerateModel(tableName, columns, c.String("dir"))
-			GenerateDao(orgTableName, appId, tableName, daoDir)
+			idType := GenerateModel(tableName, columns, c.String("dir"))
+			GenerateDao(orgTableName, appId, tableName, daoDir, idType)
 		}
 
 		//生成dao.go
@@ -36,8 +36,8 @@ func Generate(c *cli.Context) error {
 			orgTableName := table
 			columns := db.GetDataBySql("desc " + tableName)
 			tableName := getTableName(tableName, tablePrefix)
-			GenerateModel(tableName, columns, c.String("dir"))
-			GenerateDao(orgTableName, appId, tableName, daoDir)
+			idType := GenerateModel(tableName, columns, c.String("dir"))
+			GenerateDao(orgTableName, appId, tableName, daoDir, idType)
 		}
 	}
 	return nil

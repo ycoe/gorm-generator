@@ -9,19 +9,24 @@ import (
 	"strings"
 )
 
-func GenerateModel(tableName string, columns []map[string]string, dir string) {
+func GenerateModel(tableName string, columns []map[string]string, dir string) string {
 	index := strings.LastIndex(dir, "/")
 	daoPackage := dir[index+1 : len(dir)]
 	var codes []jen.Code
-	for _, col := range columns {
+	idType := ""
+	for i, col := range columns {
 		t := col["Type"]
 		column := col["Field"]
 		var st *jen.Statement
 		if column == "id" {
-			st = jen.Id("ID").Uint().Tag(map[string]string{"json": "id"})
+			st = jen.Id("ID").Int32().Tag(map[string]string{"json": "id"})
+			idType = "int32"
 		} else {
 			st = jen.Id(helper.SnakeCase2CamelCase(column, true))
-			getCol(st, t)
+			columnType := getCol(st, t)
+			if idType == "" && i == 0 {
+				idType = columnType
+			}
 			st.Tag(map[string]string{"json": column})
 		}
 		st.Comment(col["Comment"])
@@ -37,20 +42,23 @@ func GenerateModel(tableName string, columns []map[string]string, dir string) {
 	if err := f.Save(fileName); err != nil {
 		fmt.Println(err.Error())
 	}
+	return idType
 }
 
-func getCol(st *jen.Statement, t string) {
+func getCol(st *jen.Statement, t string) string {
 	prefix := strings.Split(t, "(")[0]
 	switch prefix {
 	case "int", "tinyint", "smallint", "bigint", "mediumint":
-		st.Int()
-	case "float":
+		st.Int32()
+		return "int32"
+	case "float", "decimal":
 		st.Float32()
-	case "decimal":
-		st.Float32()
+		return "float32"
 	case "date", "time", "timestamp", "year", "datetime":
 		st.Id("*").Qual("time", "Time")
+		return "time.Time"
 	default:
 		st.String()
+		return "string"
 	}
 }
