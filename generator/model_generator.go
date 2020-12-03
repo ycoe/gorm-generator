@@ -18,17 +18,12 @@ func GenerateModel(tableName string, columns []map[string]string, dir string) st
 		t := col["Type"]
 		column := col["Field"]
 		var st *jen.Statement
-		if column == "id" {
-			st = jen.Id("ID").Int32().Tag(map[string]string{"json": "id"})
-			idType = "int32"
-		} else {
-			st = jen.Id(helper.SnakeCase2CamelCase(column, true))
-			columnType := getCol(st, t)
-			if idType == "" && i == 0 {
-				idType = columnType
-			}
-			st.Tag(map[string]string{"json": column})
+		st = jen.Id(helper.SnakeCase2CamelCase(column, true))
+		columnType := getCol(st, t)
+		if idType == "" && i == 0 {
+			idType = columnType
 		}
+		st.Tag(map[string]string{"json": column})
 		st.Comment(col["Comment"])
 		codes = append(codes, st)
 	}
