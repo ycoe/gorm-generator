@@ -145,6 +145,7 @@ func genGetByIdFun(f *jen.File, appId, tableName, idType string) {
 	entityName := helper.SnakeCase2CamelCase(inflection.Singular(tableName), true)
 	entityVarName := helper.SnakeCase2CamelCase(inflection.Singular(tableName), false)
 	entityDaoName := entityName + "Dao"
+
 	f.Comment("通过ID获取").Line().Func().Params(
 		jen.Id("d").Id("*"+entityDaoName),
 	).Id("GetById").Params(
@@ -166,6 +167,7 @@ func genGetByIdFun(f *jen.File, appId, tableName, idType string) {
 		),
 		jen.Id("err").Op("=").Id("db").Dot("First").Call(
 			jen.Id("&").Id(entityVarName),
+			jen.Lit("id=?"),
 			jen.Id("id"),
 		).Dot("Error"),
 		jen.Return(),

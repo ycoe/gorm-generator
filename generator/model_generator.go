@@ -43,9 +43,12 @@ func GenerateModel(tableName string, columns []map[string]string, dir string) st
 func getCol(st *jen.Statement, t string) string {
 	prefix := strings.Split(t, "(")[0]
 	switch prefix {
-	case "int", "tinyint", "smallint", "bigint", "mediumint":
+	case "int", "tinyint", "smallint", "mediumint":
 		st.Int32()
 		return "int32"
+	case "bigint":
+		st.Int64()
+		return "int64"
 	case "float", "decimal":
 		st.Float32()
 		return "float32"
