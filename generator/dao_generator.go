@@ -19,7 +19,7 @@ type AccountDao struct {
 }
 
 func (account *AccountDao) Create (entity *model.Account) (uint, error) {
-	result := account.dao.client.Table("accounts").Create(entity)
+	result := account.dao.Client.Table("accounts").Create(entity)
 	return entity.ID, result.Error
 }
 */
@@ -50,12 +50,12 @@ func GenerateDao(orgTableName string, appId, tableName, dir, idType string) {
 /**
 func GetUserFundDao(tx ...*gorm.DB) *UserFundDao {
 	if len(tx) == 0 {
-		err := GetDao().Ping()
+		err := common.GetDao().Ping()
 		if err != nil {
 			logger.Error(err)
 		}
 		return &UserFundDao{
-			client: GetDao().client,
+			client: common.GetDao().Client,
 		}
 	} else {
 		return &UserFundDao{
@@ -72,7 +72,7 @@ func genGetEntityDao(f *jen.File, orgTableName string, tableName string) {
 		jen.If(
 			jen.Id("len").Call(jen.Id("tx")).Op("==").Id("0"),
 		).Block(
-			jen.Id("err").Op(":=").Id("GetDao").Call().Dot("Ping").Call(),
+			jen.Id("err").Op(":=").Qual("gitee.com/inngke/proto/common", "GetDao").Call().Dot("Ping").Call(),
 			jen.If(
 				jen.Id("err").Op("!=").Nil().Block(
 					jen.Qual("github.com/micro/go-micro/v2/logger", "Error").Call(
@@ -83,7 +83,7 @@ func genGetEntityDao(f *jen.File, orgTableName string, tableName string) {
 			jen.Return(
 				jen.Id("&"+tableDaoName).Values(
 					jen.Dict{
-						jen.Id("client"): jen.Id("GetDao").Call().Dot("client"),
+						jen.Id("client"): jen.Id("common").Dot("GetDao").Call().Dot("Client"),
 					},
 				),
 			),

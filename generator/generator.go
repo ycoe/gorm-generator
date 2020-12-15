@@ -28,9 +28,9 @@ func Generate(c *cli.Context) error {
 		}
 
 		//生成dao.go
-		index := strings.LastIndex(daoDir, "/")
-		daoPackage := daoDir[index+1:]
-		GenBaseDao(appId, daoPackage, tableNames, tablePrefix)
+		//index := strings.LastIndex(daoDir, "/")
+		//daoPackage := daoDir[index+1:]
+		//GenBaseDao(appId, daoPackage, tableNames, tablePrefix)
 	} else {
 		for _, table := range strings.Split(tableName, ",") {
 			orgTableName := table
