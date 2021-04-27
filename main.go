@@ -53,7 +53,12 @@ func main() {
 			Usage: "table prefix",
 			Value: "",
 		},
+		cli.StringFlag{
+			Name:  "dp",
+			Usage: "file dao.go path",
+			Value: "gitee.com/inngke/proto/common",
+		},
 	}
 	app.Action = generator.Generate
-	app.Run(os.Args)
+	_ = app.Run(os.Args)
 }

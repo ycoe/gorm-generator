@@ -1,8 +1,7 @@
 gorm-generator
 ===
 
-这是 [gorm.io/gorm](https://gorm.io/gorm) 的代码生成器，从项目 https://github.com/BigKuCha/model-generator 中变更而来
-主要配合 go-micro v2生成对应的代码
+这是 [gorm.io/gorm](https://github.com/go-gorm/gorm) 的代码生成器，从项目 https://github.com/BigKuCha/model-generator 中变更而来
 
 依赖
 ===
@@ -84,5 +83,11 @@ $GOPATH/bin/gorm-generator -u=root -p=(pwd of your mysql) -d=database -t=table -
     <td>tablePrefix, tp</td>
     <td>可选</td>
     <td>表前缀</td>
+  </tr>
+  
+  <tr>
+    <td>dp</td>
+    <td>可选</td>
+    <td>dao.go的包路径,默认值：gitee.com/inngke/proto/common</td>
   </tr>
 </table>
