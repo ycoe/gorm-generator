@@ -8,11 +8,13 @@ import (
 )
 
 func Generate(c *cli.Context) error {
-	dbSns := fmt.Sprintf("%s:%s@/%s?charset=utf8&parseTime=True&loc=Local",
-		c.String("u"), c.String("p"), c.String("d"))
+	dbSns := fmt.Sprintf("%s:%s@(%s)/%s?charset=utf8&parseTime=True&loc=Local",
+		c.String("u"), c.String("p"), c.String("host"), c.String("d"))
+	print(dbSns)
 	db := database.GetDB(dbSns)
 	appId := c.String("appid")
 	daoDir := c.String("daodir")
+	modelDir := c.String("dir")
 	daoPackage := c.String("dp")
 	tableName := c.String("t")
 	tablePrefix := c.String("tablePrefix")
@@ -24,8 +26,9 @@ func Generate(c *cli.Context) error {
 			tableName := getTableName(orgTableName, tablePrefix)
 			tableNames = append(tableNames, tableName)
 			columns := db.GetDataBySql("SHOW FULL COLUMNS FROM  " + orgTableName)
-			idType := GenerateModel(tableName, columns, c.String("dir"))
-			GenerateDao(orgTableName, appId, tableName, daoDir, idType, daoPackage)
+
+			idType := GenerateModel(tableName, columns, modelDir)
+			GenerateDao(orgTableName, appId, tableName, daoDir, modelDir, idType, daoPackage)
 		}
 
 		//生成dao.go
@@ -35,10 +38,10 @@ func Generate(c *cli.Context) error {
 	} else {
 		for _, table := range strings.Split(tableName, ",") {
 			orgTableName := table
-			columns := db.GetDataBySql("desc " + tableName)
-			tableName := getTableName(tableName, tablePrefix)
-			idType := GenerateModel(tableName, columns, c.String("dir"))
-			GenerateDao(orgTableName, appId, tableName, daoDir, idType, daoPackage)
+			columns := db.GetDataBySql("desc " + orgTableName)
+			tableName := getTableName(table, tablePrefix)
+			idType := GenerateModel(tableName, columns, modelDir)
+			GenerateDao(orgTableName, appId, tableName, daoDir, modelDir, idType, daoPackage)
 		}
 	}
 	return nil

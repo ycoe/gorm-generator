@@ -15,7 +15,12 @@ func main() {
 	app.Usage = "generate model for jinzhu/gorm"
 	app.Flags = []cli.Flag{
 		cli.StringFlag{
-			Name:  "username,u",
+			Name:  "host",
+			Value: "127.0.0.1:3306",
+			Usage: "mysql server,default;127.0.0.1:3306",
+		},
+		cli.StringFlag{
+			Name:  "username, u",
 			Value: "root",
 			Usage: "Username of mysql",
 		},

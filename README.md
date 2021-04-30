@@ -39,6 +39,11 @@ $GOPATH/bin/gorm-generator -u=root -p=(pwd of your mysql) -d=database -t=table -
     <th>使用</th>
   </tr>
   <tr>
+    <td>host, h</td>
+    <td>非必填，默认：127.0.0.1:3306</td>
+    <td>数据库服务器地址</td>
+  </tr>
+  <tr>
     <td>username, u</td>
     <td>非必填，默认：root</td>
     <td>数据库账号</td>
