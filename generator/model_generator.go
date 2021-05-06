@@ -86,7 +86,7 @@ func genEncoding(f *jen.File, name string) {
 		jen.If(
 			jen.Id("err").Op("!=").Nil(),
 		).Block(
-			jen.Qual("gitee.com/inngke/go-base-service/common/logger", "Error").Call(
+			jen.Qual("gitee.com/inngke/go-base-service/common/loggers", "Error").Call(
 				jen.Id("err").Dot("Error").Call(),
 			),
 			jen.Return(

@@ -54,9 +54,9 @@ func GenerateDao(orgTableName string, appId, tableName, daoDir, modelDir, idType
 func GetStoreOrderDao(args ...interface{}) *StoreOrderDao {
 	var client *gorm.DB
 	if args == nil {
-		client = database.GetDao().Client
+		client = dbs.GetDao().Client
 	} else {
-		client = database.GetDao(args).Client
+		client = dbs.GetDao(args).Client
 	}
 
 	return &StoreOrderDao{client: client}
@@ -71,9 +71,9 @@ func genGetEntityDao(f *jen.File, orgTableName string, tableName, baseDaoPackage
 		jen.If(
 			jen.Id("args").Op("==").Nil(),
 		).Block(
-			jen.Id("client").Op("=").Qual("gitee.com/inngke/go-base-service/common/database", "GetDao").Call().Dot("Client"),
+			jen.Id("client").Op("=").Qual("gitee.com/inngke/go-base-service/common/dbs", "GetDao").Call().Dot("Client"),
 		).Else().Block(
-			jen.Id("client").Op("=").Qual("gitee.com/inngke/go-base-service/common/database", "GetDao").Call(
+			jen.Id("client").Op("=").Qual("gitee.com/inngke/go-base-service/common/dbs", "GetDao").Call(
 				jen.Id("args"),
 			).Dot("Client"),
 		),
